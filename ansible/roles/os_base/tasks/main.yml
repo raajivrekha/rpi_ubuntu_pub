@@ -1,2 +1,22 @@
 ---
 # tasks file for os_base
+
+- name: Set timezone to America/New_York
+  become: true
+  timezone:
+    name: America/New_York
+  tags: timezone
+
+- name: Ensure localisation files for system locale '{{ config_system_locale }}' are available
+  become: yes
+  locale_gen:
+    name: "{{ config_system_locale }}"
+    state: present
+  tags: locale
+
+- name: Ensure localisation files for system language '{{ config_system_language }}' are available
+  become: yes
+  locale_gen:
+    name: "{{ config_system_language }}"
+    state: present
+  tags: locale

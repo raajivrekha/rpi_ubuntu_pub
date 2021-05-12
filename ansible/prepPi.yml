@@ -3,6 +3,7 @@
 - hosts: pitest
   gather_facts: True
   roles:
+    - { role: os_base }
     #- { role: os_base }
     #- { role: os_kernel }
     #- { role: os_base_packages }
