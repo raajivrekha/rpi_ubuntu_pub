@@ -1,0 +1,4 @@
+[pi_prod]
+
+[pitest]
+192.168.3.246 ansible_user=ubuntu
