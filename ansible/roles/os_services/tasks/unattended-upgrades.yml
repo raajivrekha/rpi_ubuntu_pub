@@ -1,0 +1,101 @@
+---
+# tasks file for unattended-upgrades service
+
+- name: Install unattended-upgrades package (if not present)
+  become: yes
+  apt: 
+    install_recommends: yes
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - unattended-upgrades
+  tags: unattended-upgrades
+
+- name: Configure unattended-upgrades (AutoFixInterruptedDpkg "true")
+  become: yes
+  lineinfile: 
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades 
+    regexp: '^//Unattended-Upgrade::AutoFixInterruptedDpkg(.*)'
+    line: 'Unattended-Upgrade::AutoFixInterruptedDpkg "true";'
+  tags: unattended-upgrades
+
+- name: Configure unattended-upgrades (MinimalSteps "true")
+  become: yes
+  lineinfile: 
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades 
+    regexp: '^//Unattended-Upgrade::MinimalSteps(.*)'
+    line: 'Unattended-Upgrade::MinimalSteps "true";'
+  tags: unattended-upgrades
+
+- name: Configure unattended-upgrades (Remove-Unused-Kernel-Packages "true")
+  become: yes
+  lineinfile: 
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades 
+    regexp: '^//Unattended-Upgrade::Remove-Unused-Kernel-Packages(.*)'
+    line: 'Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";'
+  tags: unattended-upgrades
+
+- name: Configure unattended-upgrades (Remove-New-Unused-Dependencies "true")
+  become: yes
+  lineinfile: 
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades 
+    regexp: '^//Unattended-Upgrade::Remove-New-Unused-Dependencies(.*)'
+    line: 'Unattended-Upgrade::Remove-New-Unused-Dependencies "true";'
+  tags: unattended-upgrades
+
+- name: Configure unattended-upgrades (Remove-Unused-Dependencies "true")
+  become: yes
+  lineinfile: 
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades 
+    regexp: '^//Unattended-Upgrade::Remove-Unused-Dependencies(.*)'
+    line: 'Unattended-Upgrade::Remove-Unused-Dependencies "true";'
+  tags: unattended-upgrades
+
+- name: Configure unattended-upgrades (Automatic-Reboot "true")
+  become: yes
+  lineinfile: 
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades 
+    regexp: '^//Unattended-Upgrade::Automatic-Reboot(.*)'
+    line: 'Unattended-Upgrade::Automatic-Reboot "true";'
+  tags: unattended-upgrades
+
+- name: Configure unattended-upgrades (Automatic-Reboot-WithUsers "true")
+  become: yes
+  lineinfile: 
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades 
+    regexp: '^//Unattended-Upgrade::Automatic-Reboot-WithUsers(.*)'
+    line: 'Unattended-Upgrade::Automatic-Reboot-WithUsers "true";'
+  tags: unattended-upgrades
+
+- name: Configure unattended-upgrades (SyslogEnable "true")
+  become: yes
+  lineinfile: 
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades 
+    regexp: '^//Unattended-Upgrade::SyslogEnable(.*)'
+    line: 'Unattended-Upgrade::SyslogEnable "true";'
+  tags: unattended-upgrades
+
+- name: Configure unattended-upgrades (SyslogFacility "daemon")
+  become: yes
+  lineinfile: 
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades 
+    regexp: '^//Unattended-Upgrade::SyslogFacility(.*)'
+    line: 'Unattended-Upgrade::SyslogFacility "daemon";'
+  tags: unattended-upgrades
+
+- name: Configure unattended-upgrades (Verbose "true")
+  become: yes
+  lineinfile: 
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades 
+    regexp: '^//Unattended-Upgrade::Verbose(.*)'
+    line: 'Unattended-Upgrade::Verbose "true";'
+  tags: unattended-upgrades
+
+- name: Reload unattended-upgrades Service
+  become: yes
+  service: 
+    name: unattended-upgrades
+    state: restarted
+  changed_when: false
+  tags: unattended-upgrades

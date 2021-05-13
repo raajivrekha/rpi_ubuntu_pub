@@ -1,0 +1,36 @@
+---
+# tasks file for os_base_packages
+
+- name: Install OS Base Packages
+  become: yes
+  apt: 
+    install_recommends: yes
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - aptitude
+      - python-apt
+      - apt-transport-https
+      - dkms
+      - debian-archive-keyring
+      - console-data
+      - console-common
+      - xkbset
+      - locales-all
+      - dnsutils
+      - screen
+      - rsync
+      - wget
+      - curl
+      - vim
+      - git
+      - ttf-mscorefonts-installer
+      - iotop
+      - screenfetch
+      - firmware-b43-installer
+      - cpuinfo 
+      - unattended-upgrades
+      - mailutils
+      - mlocate
+    tags: basepackages
