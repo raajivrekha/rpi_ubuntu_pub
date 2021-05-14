@@ -6,6 +6,7 @@
   command: "findmnt -no PARTUUID /boot/firmware"
   register: var_part_boot
   changed_when: false
+  ignore_errors: True
   tags: fstabsetup
 
 - name: Obtain system PARTUUID for /
@@ -29,15 +30,15 @@
   copy:
     dest: "/etc/fstab"
     content: |
-      PARTUUID={{ var_part_boot.stdout }}  /boot     auto  defaults,noatime                    0 2
-      PARTUUID={{ var_part_root.stdout }}  /         ext4  defaults,noatime,commit=1800        0 1
-      /tmp                  /tmp      tmpfs rw,bind,noatime,nodev,nosuid,noexec 0 0
-      /opt                  /opt      tmpfs rw,bind,noatime,nodev,nosuid        0 0
-      /home                 /home     tmpfs rw,bind,noatime,nodev               0 0
-      /var                  /var      tmpfs rw,bind,noatime,nodev,nosuid        0 0
-      /var/log              /var/log  tmpfs rw,bind,noatime,nodev,nosuid,noexec 0 0
-      /var/tmp              /var/tmp  tmpfs rw,bind,noatime,nodev,nosuid,noexec 0 0
-      proc                  /proc     proc  defaults                            0 0
-      tmpfs                 /dev/shm  tmpfs noatime,noexec,nodev,nosuid         0 0
+      PARTUUID={{ var_part_boot.stdout }}  /boot/firmware    auto  defaults,noatime                    0 2
+      PARTUUID={{ var_part_root.stdout }}  /                 ext4  defaults,noatime,commit=1800        0 1
+      /tmp                  /tmp              tmpfs rw,bind,noatime,nodev,nosuid,noexec 0 0
+      /opt                  /opt              tmpfs rw,bind,noatime,nodev,nosuid        0 0
+      /home                 /home             tmpfs rw,bind,noatime,nodev               0 0
+      /var                  /var              tmpfs rw,bind,noatime,nodev,nosuid        0 0
+      /var/log              /var/log          tmpfs rw,bind,noatime,nodev,nosuid,noexec 0 0
+      /var/tmp              /var/tmp          tmpfs rw,bind,noatime,nodev,nosuid,noexec 0 0
+      proc                  /proc             proc  defaults                            0 0
+      tmpfs                 /dev/shm          tmpfs noatime,noexec,nodev,nosuid         0 0
   changed_when: false
   tags: fstabsetup
