@@ -1,0 +1,27 @@
+---
+# tasks file for config_motd
+
+- name: Fixup MOTD
+  become: yes
+  copy:
+    dest: "/etc/update-motd.d/51-custom "
+    content: |
+      #!/bin/sh
+      echo "  Scheduler:" `cat /sys/block/mmcblk0/queue/scheduler | grep -o "\[.*\]"`
+      echo " " `cat /proc/device-tree/model` '\n'
+      if [ -f /usr/bin/screenfetch ]; then /usr/bin/screenfetch -E; fi
+  tags: motd
+
+- name: Remove Execute Permissions from /etc/update-motd.d/10-help-text
+  become: yes
+  ansible.builtin.file:
+    path: /etc/update-motd.d/10-help-text
+    mode: u-x,g-x,o-x
+  tags: motd
+
+- name: Remove Execute Permissions from /etc/update-motd.d/50-motd-news
+  become: yes
+  ansible.builtin.file:
+    path: /etc/update-motd.d/50-motd-news
+    mode: u-x,g-x,o-x
+  tags: motd

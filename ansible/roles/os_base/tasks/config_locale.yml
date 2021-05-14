@@ -1,0 +1,42 @@
+---
+# tasks file for config_locale
+# relies on the vars/main.yml file for stored variables
+
+- name: Ensure localisation files for system locale '{{ config_system_locale }}' are available
+  become: yes
+  locale_gen:
+    name: "{{ config_system_locale }}"
+    state: present
+  tags: locale
+
+- name: Ensure localisation files for system language '{{ config_system_language }}' are available
+  become: yes
+  locale_gen:
+    name: "{{ config_system_language }}"
+    state: present
+  tags: locale
+
+- name: Get current locale and language configuration
+  become: yes
+  command: localectl status
+  register: locale_status
+  changed_when: false
+  tags: locale
+
+- name: Parse 'LANG' from current locale and language configuration
+  become: yes
+  set_fact:
+    locale_lang: "{{ locale_status.stdout | regex_search('LANG=([^\n]+)', '\\1') | first }}"
+  tags: locale
+
+- name: Parse 'LANGUAGE' from current locale and language configuration
+  become: yes
+  set_fact:
+    locale_language: "{{ locale_status.stdout | regex_search('LANGUAGE=([^\n]+)', '\\1') | default([locale_lang], true) | first }}"
+  tags: locale
+
+- name: Configure locale to '{{ config_system_locale }}' and language to '{{ config_system_language }}'
+  become: yes
+  command: localectl set-locale LANG={{ config_system_locale }} LANGUAGE={{ config_system_language }}
+  changed_when: locale_lang != config_system_locale or locale_language != config_system_language
+  tags: locale

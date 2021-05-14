@@ -1,0 +1,18 @@
+---
+# tasks file for config_cronjob
+
+- name: Disable Wi-Fi Power Savings (pi zero w models) via cron
+  become: yes
+  cron:
+    name: Disable Wi-Fi Power Savings (pi zero w models)
+    special_time: reboot
+    job: iwconfig wlan0 power off
+  tags: cronjob
+
+- name: Enable Kernel Scheduler (Kyber) via cron
+  become: yes
+  cron:
+    name: Enable Kernel Scheduler (Kyber)
+    special_time: reboot
+    job: echo "kyber" | tee "/sys/block/mmcblk0/queue/scheduler"
+  tags: cronjob

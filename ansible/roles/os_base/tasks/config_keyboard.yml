@@ -1,0 +1,11 @@
+---
+# tasks file for config_keyboard
+
+- name: Set US Keyboard Layout
+  become: yes
+  lineinfile:
+    path: /etc/default/keyboard
+    regexp: "^XKBLAYOUT="
+    line: "XKBLAYOUT=\"us\""
+    state: present
+  tags: keyboard

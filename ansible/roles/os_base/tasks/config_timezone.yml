@@ -1,0 +1,8 @@
+---
+# tasks file for config_timezone
+
+- name: Set timezone to America/New_York
+  become: true
+  timezone:
+    name: America/New_York
+  tags: timezone

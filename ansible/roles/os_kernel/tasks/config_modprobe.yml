@@ -1,0 +1,145 @@
+---
+# tasks file for config_modprobe
+
+- name: Disable cramfs via modprobe - /etc/modprobe.d/cramfs.conf
+  become: yes
+  copy:
+    dest: "/etc/modprobe.d/cramfs.conf"
+    content: |
+      install cramfs /bin/true
+  tags: modprobe
+
+- name: Disable dccp via modprobe - /etc/modprobe.d/dccp.conf
+  become: yes
+  copy:
+    dest: "/etc/modprobe.d/dccp.conf"
+    content: |
+      install dccp /bin/true
+  tags: modprobe
+
+- name: Disable freevxfs via modprobe - /etc/modprobe.d/freevxfs.conf
+  become: yes
+  copy:
+    dest: "/etc/modprobe.d/freevxfs.conf"
+    content: |
+      install freevxfs /bin/true
+  tags: modprobe
+
+- name: Disable hfs via modprobe - /etc/modprobe.d/hfs.conf
+  become: yes
+  copy:
+    dest: "/etc/modprobe.d/hfs.conf"
+    content: |
+      install hfs /bin/true
+  tags: modprobe
+
+- name: Disable hfsplus via modprobe - /etc/modprobe.d/hfsplus.conf
+  become: yes
+  copy:
+    dest: "/etc/modprobe.d/hfsplus.conf"
+    content: |
+      install hfsplus /bin/true
+  tags: modprobe
+
+- name: Disable jffs2 via modprobe - /etc/modprobe.d/jffs2.conf
+  become: yes
+  copy:
+    dest: "/etc/modprobe.d/jffs2.conf"
+    content: |
+      install jffs2 /bin/true
+  tags: modprobe
+
+- name: Disable rds via modprobe - /etc/modprobe.d/rds.conf
+  become: yes
+  copy:
+    dest: "/etc/modprobe.d/rds.conf"
+    content: |
+      install rds /bin/true
+  tags: modprobe
+
+- name: Disable sctp via modprobe - /etc/modprobe.d/sctp.conf
+  become: yes
+  copy:
+    dest: "/etc/modprobe.d/sctp.conf"
+    content: |
+      install sctp /bin/true
+  tags: modprobe
+
+- name: Disable squashfs via modprobe - /etc/modprobe.d/squashfs.conf
+  become: yes
+  copy:
+    dest: "/etc/modprobe.d/squashfs.conf"
+    content: |
+      install squashfs /bin/true
+  tags: modprobe
+
+- name: Disable tipc via modprobe - /etc/modprobe.d/tipc.conf
+  become: yes
+  copy:
+    dest: "/etc/modprobe.d/tipc.conf"
+    content: |
+      install tipc /bin/true
+  tags: modprobe
+
+- name: Disable udf via modprobe - /etc/modprobe.d/udf.conf
+  become: yes
+  copy:
+    dest: "/etc/modprobe.d/udf.conf"
+    content: |
+      install udf /bin/true
+  tags: modprobe
+
+- name: Disable ipv6 via modprobe - /etc/modprobe.d/ipv6.conf
+  become: yes
+  copy:
+    dest: "/etc/modprobe.d/ipv6.conf"
+    content: |
+      blacklist ipv6
+  tags: modprobe
+
+- name: Disable Bluetooth via modprobe - /etc/modprobe.d/disable_bluetooth.conf
+  become: yes
+  copy:
+    dest: "/etc/modprobe.d/disable_bluetooth.conf"
+    content: |
+      blacklist hci_uart
+      blacklist hidp
+      blacklist rfcomm
+      blacklist btbcm
+      blacklist bnep
+      blacklist bluetooth
+  tags: modprobe
+
+- name: Disable FireWire via modprobe - /etc/modprobe.d/disable_firewire.conf
+  become: yes
+  copy:
+    dest: "/etc/modprobe.d/disable_firewire.conf"
+    content: |
+      blacklist ohci1394
+      blacklist sbp2
+      blacklist dv1394
+      blacklist raw1394
+      blacklist video1394
+      blacklist firewire-ohci
+      blacklist firewire-sbp2
+  tags: modprobe
+
+- name: Disable USB Storage via modprobe - /etc/modprobe.d/disable_usb-storage.conf
+  become: yes
+  copy:
+    dest: "/etc/modprobe.d/disable_usb-storage.conf"
+    content: |
+      blacklist usb-storage
+  tags: modprobe
+
+- name: Disable Wi-Fi Power Saving (non pi zero w models) via modprobe - /etc/modprobe.d/disable_wifi_powersaving.conf 
+  become: yes
+  copy:
+    dest: "/etc/modprobe.d/disable_wifi_powersaving.conf"
+    content: |
+      options 8192cu rtw_power_mgnt=0
+      options 8188eu rtw_power_mgnt=0
+      options 8189es rtw_power_mgnt=0
+      options 8723bs rtw_power_mgnt=0
+      options wlan_8192eu rtw_power_mgnt=0
+  tags: modprobe

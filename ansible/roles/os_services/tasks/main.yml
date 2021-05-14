@@ -2,11 +2,5 @@
 # tasks file for os_services
 
 - include: ssh.yml
-  tags: ssh
 - include: rsyslog.yml
-  tags: rsyslog
 - include: unattended-upgrades.yml
-#- include: chrony.yml
-#  tags: chrony
-#- include: unattended-upgrades.yml
-#  tags: unattended-upgrades

@@ -1,0 +1,67 @@
+---
+# tasks file for config_swap
+
+- name: Check if swapfile exists
+  become: yes
+  stat: 
+    path: /swapfile
+  register: var_file_swapfile
+  tags: swapfile
+
+- name: Create swapfile and enable if it does not exist
+  become: yes
+  command: "{{ item }}"
+  with_items:
+    - "fallocate -l 1G /swapfile"
+    - "chmod 600 /swapfile"
+    - "mkswap /swapfile"
+    - "swapon /swapfile"
+  when: var_file_swapfile.stat.exists == False
+  tags: swapfile
+
+- name: Check is fstab contains swap entry
+  become: yes
+  lineinfile:
+    state: absent
+    path: "/etc/fstab"
+    regexp: "^/swapfile(.*)"
+  check_mode: true
+  changed_when: false
+  register: var_test_swap_entry
+  tags: swapfile
+
+- name: Add swap fstab entry
+  become: yes
+  lineinfile:
+    state: present
+    path: "/etc/fstab"
+    line: "/swapfile             none      swap  sw                                  0 0"
+  when: var_test_swap_entry.found == 0
+  tags: swapfile
+
+- name: Change system swapiness (10) #original 60
+  become: yes
+  command: sysctl vm.swappiness=10
+  tags: swapfile
+
+- name: Change system cache pressure (50) #original 100
+  become: yes
+  command: sysctl vm.vfs_cache_pressure=50
+  tags: swapfile
+
+- name: Setup swapfile options in /etc/sysctl.d/10-swapfile.conf
+  become: yes
+  copy:
+    dest: "/etc/sysctl.d/10-swapfile.conf"
+    content: |
+      # Swapfile Configurations
+      vm.swappiness=10
+      vm.vfs_cache_pressure=50
+  tags: swapfile
+
+- name: Reload Sysctl Changes
+  become: yes
+  command: sysctl -p 
+  register: sysctl_status
+  changed_when: false
+  tags: swapfile

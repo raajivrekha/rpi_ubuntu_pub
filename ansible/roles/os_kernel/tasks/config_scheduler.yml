@@ -1,0 +1,44 @@
+---
+# tasks file for config_scheduler
+
+- name: Set Kernel Scheduler (Kyber) On System Already Running
+  become: yes
+  command: 'echo kyber > /sys/block/mmcblk0/queue/scheduler'
+  changed_when: false
+  tags: kernelscheduler
+
+- name: Check if /boot/cmdline.txt exists
+  become: yes
+  stat: 
+    path: /boot/cmdline.txt
+  register: var_file_boot_cmdline
+  tags: kernelscheduler
+
+- name: Set Kernel Scheduler (Kyber) /boot/cmdline.txt (elevator=kyber)
+  become: yes
+  replace:
+    path: /boot/cmdline.txt
+    replace: "elevator={{item}} "
+    regexp: 'elevator=[a-z]*\s?'
+  with_items:
+  - kyber
+  when: var_file_boot_cmdline.exists == True
+  tags: kernelscheduler
+
+- name: Check if /boot/firmware/cmdline.txt exists
+  become: yes
+  stat: 
+    path: /boot/firmware/cmdline.txt
+  register: var_file_boot_firmware_cmdline
+  tags: kernelscheduler
+
+- name: Set Kernel Scheduler (Kyber) /boot/firmware/cmdline.txt (elevator=kyber)
+  become: yes
+  replace:
+    path: /boot/firmware/cmdline.txt
+    replace: "elevator={{item}} "
+    regexp: 'elevator=[a-z]*\s?'
+  with_items:
+  - kyber
+  when: var_file_boot_firmware_cmdline.exists == True
+  tags: kernelscheduler

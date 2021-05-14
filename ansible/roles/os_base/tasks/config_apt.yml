@@ -1,0 +1,30 @@
+---
+# tasks file for config_apt
+
+- name: Configure apt options - /etc/apt/apt.conf.d/99-custom-configs
+  become: yes
+  copy:
+    dest: "/etc/apt/apt.conf.d/99-custom-configs"
+    content: |
+      Acquire::Languages "none";
+      Acquire::ForceIPv4 "true";
+      APT::Install-Recommends "false";
+      APT::Install-Suggests "false";
+      APT::AutoRemove::RecommendsImportant "false";
+      APT::AutoRemove::SuggestsImportant "false";
+      Dpkg::options {
+          "--force-confdef";
+          "--force-confold";
+      }
+  tags: apt
+
+- name: Configure apt cache - /etc/apt/apt.conf.d/99-custom-cache
+  become: yes
+  copy:
+    dest: "/etc/apt/apt.conf.d/99-custom-cache"
+    content: |
+      Dir::Cache "/tmp/apt";
+      Dir::Cache::archives "/var/cache/apt/archives";
+      Dir::Cache::pkgcache "";
+      Dir::Cache::srcpkgcache "";
+  tags: apt

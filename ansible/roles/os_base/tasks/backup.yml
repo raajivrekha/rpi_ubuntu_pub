@@ -1,0 +1,215 @@
+---
+# tasks file for os_base
+
+- name: Set timezone to America/New_York
+  become: true
+  timezone:
+    name: America/New_York
+  tags: timezone
+
+- name: Ensure localisation files for system locale '{{ config_system_locale }}' are available
+  become: yes
+  locale_gen:
+    name: "{{ config_system_locale }}"
+    state: present
+  tags: locale
+
+- name: Ensure localisation files for system language '{{ config_system_language }}' are available
+  become: yes
+  locale_gen:
+    name: "{{ config_system_language }}"
+    state: present
+  tags: locale
+
+- name: Get current locale and language configuration
+  become: yes
+  command: localectl status
+  register: locale_status
+  changed_when: false
+  tags: locale
+
+- name: Parse 'LANG' from current locale and language configuration
+  become: yes
+  set_fact:
+    locale_lang: "{{ locale_status.stdout | regex_search('LANG=([^\n]+)', '\\1') | first }}"
+  tags: locale
+
+- name: Parse 'LANGUAGE' from current locale and language configuration
+  become: yes
+  set_fact:
+    locale_language: "{{ locale_status.stdout | regex_search('LANGUAGE=([^\n]+)', '\\1') | default([locale_lang], true) | first }}"
+  tags: locale
+
+- name: Configure locale to '{{ config_system_locale }}' and language to '{{ config_system_language }}'
+  become: yes
+  command: localectl set-locale LANG={{ config_system_locale }} LANGUAGE={{ config_system_language }}
+  changed_when: locale_lang != config_system_locale or locale_language != config_system_language
+  tags: locale
+
+- name: Set US Keyboard Layout
+  become: yes
+  lineinfile:
+    path: /etc/default/keyboard
+    regexp: "^XKBLAYOUT="
+    line: "XKBLAYOUT=\"us\""
+    state: present
+  tags: keyboard
+
+- name: Fixup APT Configs
+  become: yes
+  copy:
+    dest: "/etc/apt/apt.conf.d/99-custom-configs"
+    content: |
+      Acquire::Languages "none";
+      Acquire::ForceIPv4 "true";
+      APT::Install-Recommends "false";
+      APT::Install-Suggests "false";
+      APT::AutoRemove::RecommendsImportant "false";
+      APT::AutoRemove::SuggestsImportant "false";
+      Dpkg::options {
+          "--force-confdef";
+          "--force-confold";
+      }
+  tags: apt
+
+- name: Fixup APT Cache
+  become: yes
+  copy:
+    dest: "/etc/apt/apt.conf.d/99-custom-cache"
+    content: |
+      Dir::Cache "/tmp/apt";
+      Dir::Cache::archives "/var/cache/apt/archives";
+      Dir::Cache::pkgcache "";
+      Dir::Cache::srcpkgcache "";
+  tags: apt
+
+- name: Fixup MOTD
+  become: yes
+  copy:
+    dest: "/etc/update-motd.d/51-custom "
+    content: |
+      #!/bin/sh
+      echo "  Scheduler:" `cat /sys/block/mmcblk0/queue/scheduler | grep -o "\[.*\]"`
+      echo " " `cat /proc/device-tree/model` '\n'
+      if [ -f /usr/bin/screenfetch ]; then /usr/bin/screenfetch -E; fi
+  tags: motd
+
+- name: Remove Execute Permissions from /etc/update-motd.d/10-help-text
+  become: yes
+  ansible.builtin.file:
+    path: /etc/update-motd.d/10-help-text
+    mode: u-x,g-x,o-x
+  tags: motd
+
+- name: Remove Execute Permissions from /etc/update-motd.d/50-motd-news
+  become: yes
+  ansible.builtin.file:
+    path: /etc/update-motd.d/50-motd-news
+    mode: u-x,g-x,o-x
+  tags: motd
+
+- name: obtain system PARTUUID for /boot/firmware
+  become: yes
+  command: "findmnt -no PARTUUID /boot/firmware"
+  register: var_part_boot
+  changed_when: false
+  tags: fstabsetup
+
+- name: Obtain system PARTUUID for /
+  become: yes
+  command: "findmnt -no PARTUUID /"
+  register: var_part_root
+  changed_when: false
+  tags: fstabsetup
+
+- name: Zero out system fstab file
+  become: yes
+  copy:
+    content: ""
+    dest: /etc/fstab
+    force: yes
+  changed_when: false
+  tags: fstabsetup
+
+- name: Setup fstab file
+  become: yes
+  copy:
+    dest: "/etc/fstab"
+    content: |
+      PARTUUID={{ var_part_boot.stdout }}  /boot     auto  defaults,noatime                    0 2
+      PARTUUID={{ var_part_root.stdout }}  /         ext4  defaults,noatime,commit=1800        0 1
+      /tmp                  /tmp      tmpfs rw,bind,noatime,nodev,nosuid,noexec 0 0
+      /opt                  /opt      tmpfs rw,bind,noatime,nodev,nosuid        0 0
+      /home                 /home     tmpfs rw,bind,noatime,nodev               0 0
+      /var                  /var      tmpfs rw,bind,noatime,nodev,nosuid        0 0
+      /var/log              /var/log  tmpfs rw,bind,noatime,nodev,nosuid,noexec 0 0
+      /var/tmp              /var/tmp  tmpfs rw,bind,noatime,nodev,nosuid,noexec 0 0
+      proc                  /proc     proc  defaults                            0 0
+      tmpfs                 /dev/shm  tmpfs noatime,noexec,nodev,nosuid         0 0
+  changed_when: false
+  tags: fstabsetup
+
+- name: Check if swapfile exists
+  become: yes
+  stat: 
+    path: /swapfile
+  register: var_file_swapfile
+  tags: swapfile
+
+- name: Create swapfile and enable if it does not exist
+  become: yes
+  command: "{{ item }}"
+  with_items:
+    - "fallocate -l 1G /swapfile"
+    - "chmod 600 /swapfile"
+    - "mkswap /swapfile"
+    - "swapon /swapfile"
+  when: var_file_swapfile.stat.exists == False
+  tags: swapfile
+
+- name: Check is fstab contains swap entry
+  become: yes
+  lineinfile:
+    state: absent
+    path: "/etc/fstab"
+    regexp: "^/swapfile(.*)"
+  check_mode: true
+  changed_when: false
+  register: var_test_swap_entry
+  tags: swapfile
+
+- name: Add swap fstab entry
+  become: yes
+  lineinfile:
+    state: present
+    path: "/etc/fstab"
+    line: "/swapfile             none      swap  sw                                  0 0"
+  when: var_test_swap_entry.found == 0
+  tags: swapfile
+
+- name: Change system swapiness (10) #original 60
+  become: yes
+  command: sysctl vm.swappiness=10
+  tags: swapfile
+
+- name: Change system cache pressure (50) #original 100
+  become: yes
+  command: sysctl vm.vfs_cache_pressure=50
+  tags: swapfile
+
+- name: Setup swapfile options in /etc/sysctl.d/10-swapfile.conf
+  become: yes
+  copy:
+    dest: "/etc/sysctl.d/10-swapfile.conf"
+    content: |
+      # Swapfile Configurations
+      vm.swappiness=10
+      vm.vfs_cache_pressure=50
+  tags: swapfile
+
+- name: Reload Sysctl Changes
+  become: yes
+  command: sysctl -p 
+  register: sysctl_status
+  changed_when: false
+  tags: swapfile

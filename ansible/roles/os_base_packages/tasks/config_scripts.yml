@@ -1,0 +1,61 @@
+---
+# tasks file for os_base_packages
+
+- name: Install cleanupJournals.sh Script to /opt/scripts
+  become: yes
+  copy:
+    dest: "/opt/scripts/cleanupJournals.sh"
+    content: |
+      #!/bin/bash
+      sudo journalctl --disk-usage
+      sudo journalctl --rotate --vacuum-size=100M
+  tags: script-cleanupJournals
+
+- name: Set Execute Permissions /opt/scripts/cleanupJournals.sh
+  become: yes
+  ansible.builtin.file:
+    path: /opt/scripts/cleanupJournals.sh
+    mode: u+x,g+x,o+x
+  tags: script-cleanupJournals
+
+- name: Install cleanupKernels.sh Script to /opt/scripts
+  become: yes
+  copy:
+    dest: "/opt/scripts/cleanupKernels.sh"
+    content: |
+      #!/bin/bash
+      sudo apt-mark auto ^linux-image- && sudo apt autoremove -y
+  tags: script-cleanupKernels
+
+- name: Set Execute Permissions /opt/scripts/cleanupKernels.sh
+  become: yes
+  ansible.builtin.file:
+    path: /opt/scripts/cleanupJournals.sh
+    mode: u+x,g+x,o+x
+  tags: script-cleanupKernels
+
+- name: Install runLynis.sh Script to /opt/scripts
+  become: yes
+  copy:
+    dest: "/opt/scripts/runLynis.sh"
+    content: |
+      #!/bin/bash
+      VAR_TIMESTAMP=`date +%Y-%m-%d_%I%M%S`
+      VAR_DIR_REPORTS="$HOME/lynisreports"
+      VAR_RUN_USER=$USER
+
+      mkdir -p "$VAR_DIR_REPORTS"
+      sudo lynis audit system --no-colors --verbose | tee -ia "$VAR_DIR_REPORTS/$HOSTNAME-lynis-output-$VAR_TIMESTAMP.txt"
+
+      sudo cp -af /var/log/lynis.log $VAR_DIR_REPORTS/lynis-$VAR_TIMESTAMP.log
+      sudo cp -af /var/log/lynis-report.dat $VAR_DIR_REPORTS/lynis-report-$VAR_TIMESTAMP.dat
+
+      sudo chown -R $VAR_RUN_USER:$VAR_RUN_USER $VAR_DIR_REPORTS
+  tags: script-runLynis
+
+- name: Set Execute Permissions /opt/scripts/runLynis.sh
+  become: yes
+  ansible.builtin.file:
+    path: /opt/scripts/runLynis.sh
+    mode: u+x,g+x,o+x
+  tags: script-runLynis
