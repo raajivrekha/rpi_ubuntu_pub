@@ -55,7 +55,7 @@
 - name: Set Execute Permissions /opt/scripts/cleanupKernels.sh
   become: yes
   ansible.builtin.file:
-    path: /opt/scripts/cleanupJournals.sh
+    path: /opt/scripts/cleanupKernels.sh
     mode: u+x,g+x,o+x
   tags: script-cleanupKernels
 

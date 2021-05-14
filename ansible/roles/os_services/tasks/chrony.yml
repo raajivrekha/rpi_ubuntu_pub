@@ -1,0 +1,47 @@
+---
+# tasks file for rsyslog service
+
+- name: Install chrony package  (if not present)
+  become: yes
+  apt: 
+    install_recommends: yes
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - chrony
+  tags: chrony
+
+- name: Configure chrony Service to include local ntp server  - /etc/chrony/chrony.conf
+  become: yes
+  ansible.builtin.lineinfile:
+    path: /etc/chrony/chrony.conf
+    firstmatch: yes
+    insertbefore: '^pool ntp.ubuntu.com(.*)' 
+    line: 'pool {{ config_local_ntp_server }}           iburst maxsources 1'
+    state: present
+  tags: chrony
+
+- name: Configure chrony daemon to use ipv4  - /etc/default/chrony
+  become: yes
+  ansible.builtin.lineinfile:
+    path: /etc/default/chrony
+    firstmatch: yes
+    regexp: '^DAEMON_OPTS=(.*)'
+    line: 'DAEMON_OPTS="-4 -F -1"'
+  changed_when: false
+  tags: chrony
+
+- name: Set system timedatectl to use ntp
+  become: yes
+  command: timedatectl set-ntp yes
+  changed_when: false
+  tags: chrony
+
+- name: Restart chrony Service
+  become: yes
+  service: 
+    name: chrony
+    state: restarted
+  changed_when: false
+  tags: chrony

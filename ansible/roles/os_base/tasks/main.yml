@@ -3,6 +3,7 @@
 
 - include: config_apt.yml
 - include: config_fstab.yml
+- include: config_journald.yml
 - include: config_keyboard.yml
 - include: config_locale.yml
 - include: config_motd.yml

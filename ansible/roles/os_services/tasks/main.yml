@@ -1,6 +1,7 @@
 ---
 # tasks file for os_services
 
+- include: chrony.yml
 - include: ssh.yml
 - include: rsyslog.yml
 - include: unattended-upgrades.yml

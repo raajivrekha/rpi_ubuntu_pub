@@ -1,0 +1,4 @@
+---
+# vars file for os_services
+
+config_local_ntp_server: '192.168.3.1'

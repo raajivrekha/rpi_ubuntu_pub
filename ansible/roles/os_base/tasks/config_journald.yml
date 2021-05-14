@@ -1,0 +1,26 @@
+---
+# tasks file for config_journald
+
+- name: Configure SystemMaxUse - /etc/systemd/journald.conf #100M
+  become: yes
+  lineinfile: 
+    dest: /etc/systemd/journald.conf 
+    regexp: '^#SystemMaxUse(.*)'
+    line: 'SystemMaxUse=100M'
+  tags: config-journald
+
+- name: Configure MaxFileSec - /etc/systemd/journald.conf #5days
+  become: yes
+  lineinfile: 
+    dest: /etc/systemd/journald.conf 
+    regexp: '^#MaxFileSec(.*)'
+    line: 'MaxFileSec=5day'
+  tags: config-journald
+
+- name: Restart systemd-journald
+  become: yes
+  service: 
+    name: systemd-journald
+    state: restarted
+  changed_when: false
+  tags: config-journald
