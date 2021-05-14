@@ -22,5 +22,5 @@
     regexp: 'elevator=[a-z]*\s?'
   with_items:
   - kyber
-  when: var_file_boot_firmware_cmdline.exists == True
+  when: var_file_boot_firmware_cmdline.stat.exists == True
   tags: kernelscheduler
