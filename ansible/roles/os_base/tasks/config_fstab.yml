@@ -6,7 +6,7 @@
   command: "findmnt -no PARTUUID /boot/firmware"
   register: var_part_boot
   changed_when: false
-  ignore_errors: True
+  #ignore_errors: True
   tags: fstabsetup
 
 - name: Obtain system PARTUUID for /
