@@ -1,0 +1,39 @@
+---
+# tasks file for config_wifipowersave
+
+- name: Create a Service named wifi_powersave
+  become: yes
+  copy:
+    dest: "/etc/systemd/system/wifi_powersave@.service"
+    content: |
+      [Unit]
+      Description=Set WiFi power save %i
+      After=sys-subsystem-net-devices-wlan0.device
+
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+      ExecStart=/sbin/iw dev wlan0 set power_save %i
+
+      [Install]
+      WantedBy=sys-subsystem-net-devices-wlan0.device
+  tags: wifipowersave
+
+- name: Set appropriate permissions on wifi_powersave service file
+  become: yes
+  ansible.builtin.file:
+    path: /etc/systemd/system/wifi_powersave@.service
+    mode: 0755
+  tags: wifipowersave
+
+- name: Turn off wifi power save
+  become: yes
+  command: 'systemctl enable wifi_powersave@off.service'
+  tags: wifipowersave
+  # Requires Reboot of device
+  # Options here are:
+  # Enable the Service to turn OFF power saving <-Default
+  # Enable the Service to turn ON power saving; systemctl enable wifi_powersave@on.service
+  # Disable the Service to turn ON power saving; sudo systemctl disable wifi_powersave@on.service
+  # Disable the Service to turn OFF power saving; systemctl disable wifi_powersave@off.service
+  # Resource Link: https://raspberrypi.stackexchange.com/questions/96606/make-iw-wlan0-set-power-save-off-permanent

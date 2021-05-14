@@ -4,7 +4,7 @@
 - name: Fixup MOTD
   become: yes
   copy:
-    dest: "/etc/update-motd.d/51-custom "
+    dest: "/etc/update-motd.d/51-custom"
     content: |
       #!/bin/sh
       echo "  Scheduler:" `cat /sys/block/mmcblk0/queue/scheduler | grep -o "\[.*\]"`
