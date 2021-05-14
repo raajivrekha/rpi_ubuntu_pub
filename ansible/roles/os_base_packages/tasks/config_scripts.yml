@@ -1,5 +1,30 @@
 ---
-# tasks file for os_base_packages
+# tasks file for config_scripts
+
+- name: Check if /opt/scripts directory exists
+  become: yes
+  stat:
+    path: /opt/scripts
+  register: var_dir_opt_scripts
+  tags: dir-opt-scripts
+
+- name: Echo if directory exists
+  become: yes
+  debug:
+    msg: "/opt/scripts already exists"
+  when: var_dir_opt_scripts.stat.exists == True
+  tags: dir-opt-scripts
+
+- name: Create /opt/scripts if it does not exist"
+  become: yes
+  file:
+    path: /opt/scripts
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  when: var_dir_opt_scripts.stat.exists == False
+  tags: dir-opt-scripts
 
 - name: Install cleanupJournals.sh Script to /opt/scripts
   become: yes
