@@ -25,7 +25,6 @@
       - curl
       - vim
       - git
-      - ttf-mscorefonts-installer
       - iotop
       - screenfetch
       - firmware-b43-installer
@@ -33,4 +32,18 @@
       - unattended-upgrades
       - mailutils
       - mlocate
+      - apt-show-versions
+      - colorized-logs
+      - ubuntu-restricted-extras
+      - util-linux-locales
+      - fonts-dejavu
+      - fonts-dejavu-extra
+      - fonts-ubuntu
+      - fonts-ubuntu-console
+      - fonts-ubuntu-font-family-console
+      - ttf-ancient-fonts-symbola
+      - ttf-mscorefonts-installer
+      - xfonts-100dpi
+      - xfonts-75dpi
+      - xfonts-base
   tags: basepackages

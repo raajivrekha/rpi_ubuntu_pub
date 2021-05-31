@@ -70,11 +70,11 @@
       VAR_RUN_USER=$USER
 
       mkdir -p "$VAR_DIR_REPORTS"
-      sudo lynis audit system --no-colors --verbose | tee -ia "$VAR_DIR_REPORTS/$HOSTNAME-lynis-output-$VAR_TIMESTAMP.txt"
-
+      sudo lynis audit system --auditor "$VAR_RUN_USER" --no-colors --verbose | tee -ia "/tmp/.$HOSTNAME-lynis-output-$VAR_TIMESTAMP.txt"
+      sudo less "/tmp/.$HOSTNAME-lynis-output-$VAR_TIMESTAMP.txt" | ansi2txt | col -b >> $VAR_DIR_REPORTS/$HOSTNAME-lynis-output-$VAR_TIMESTAMP.txt
       sudo cp -af /var/log/lynis.log $VAR_DIR_REPORTS/lynis-$VAR_TIMESTAMP.log
       sudo cp -af /var/log/lynis-report.dat $VAR_DIR_REPORTS/lynis-report-$VAR_TIMESTAMP.dat
-
+      sudo rm "/tmp/.$HOSTNAME-lynis-output-$VAR_TIMESTAMP.txt"
       sudo chown -R $VAR_RUN_USER:$VAR_RUN_USER $VAR_DIR_REPORTS
   tags: script-runLynis
 
